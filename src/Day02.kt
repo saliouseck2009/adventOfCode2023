@@ -1,12 +1,14 @@
+package src
 
-var lines = readFileAsLinesUsingBufferedReader("Day02.txt")
+
+var lines = readFileAsLinesUsingBufferedReader("src/Day02.txt")
 val green = "green" ;val red = "red" ;val blue = "blue"
-val cubsOnBag = mapOf(green to 13, red to 12,blue to 14)
+val cubsOnBag = mapOf(green to 13, red to 12, blue to 14)
 fun main(){
-    println(firstChallenge())
-    println(secondChallenge())
+    println(partOne())
+    println(partTwo())
 }
-private fun firstChallenge(): Int{
+private fun partOne(): Int{
     var total = 0
     lines.forEachIndexed { position, line ->
         val games = line.split(":", ";")
@@ -28,11 +30,11 @@ private fun firstChallenge(): Int{
     }
     return total
 }
-private fun secondChallenge() : Int{
+private fun partTwo() : Int{
     var total = 0
-    lines.forEach {  line ->
+    lines.forEach { line ->
         val games = line.split(":", ";")
-        val fewestNumberOfCube=  mutableMapOf(green to 0, red to 0,blue to 0)
+        val fewestNumberOfCube=  mutableMapOf(green to 0, red to 0, blue to 0)
         games.drop(1).forEach { game ->
             game.trim().split(",").forEach { item ->
                 val values = item.trim().split(" ")

@@ -3,7 +3,7 @@ plugins {
 }
 
 sourceSets {
-    main {
+    src.main {
         kotlin.srcDir("src")
     }
 }
