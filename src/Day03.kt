@@ -1,15 +1,17 @@
 package src
 
-
 private val day3Data = readFileAsLinesUsingBufferedReader("src/Day03.txt")
 fun main() {
-    part1()
+    partOneAndTwo()
 }
 
-private fun part1() {
+val symboles = mutableSetOf<Symbole>()
+val partNumbers = mutableListOf<PartNumber>()
+private fun partOneAndTwo() {
     val rows = day3Data.first().length
     val cols = day3Data.size
-    var total: Int = 0
+    var partOneResult: Int = 0
+    var secondPartResult: Int = 0
     for (row in 0..<rows) {
         var currentNumber = PartNumber(row = row)
         for (col in 0..<cols) {
@@ -21,21 +23,27 @@ private fun part1() {
                     currentNumber = currentNumber.copy(endIndex = col)
                 }
                 if (col == cols - 1) {
-                    val pair = addNumberToTotal(currentNumber, row, total)
+                    val pair = addNumberToTotal(currentNumber, row, partOneResult)
                     currentNumber = pair.first
-                    total = pair.second
+                    partOneResult = pair.second
                 }
             } else {
                 if (currentNumber.startIndex != -1) {
-                    val pair = addNumberToTotal(currentNumber, row, total)
+                    val pair = addNumberToTotal(currentNumber, row, partOneResult)
                     currentNumber = pair.first
-                    total = pair.second
+                    partOneResult = pair.second
                 }
             }
         }
-
     }
-    print(total)
+    symboles.forEach { symbole ->
+        val pair = partNumbers.filter { it.symbole != null && it.symbole == symbole }
+        if (pair.size == 2) {
+            secondPartResult += (pair.first().value.toInt() * pair.last().value.toInt())
+        }
+    }
+    println(partOneResult)
+    println(secondPartResult)
 }
 
 private fun addNumberToTotal(currentNumber: PartNumber, row: Int, total: Int): Pair<PartNumber, Int> {
@@ -45,6 +53,9 @@ private fun addNumberToTotal(currentNumber: PartNumber, row: Int, total: Int): P
         currentNumber1 = currentNumber1.copy(value = day3Data[row].substring(currentNumber1.startIndex, currentNumber1.endIndex + 1))
         if (currentNumber1.isAdjacent) {
             total1 += currentNumber1.value.toInt()
+            if (currentNumber1.symbole != null) {
+                partNumbers.add(currentNumber1)
+            }
         }
         currentNumber1 = PartNumber()
     }
@@ -53,33 +64,36 @@ private fun addNumberToTotal(currentNumber: PartNumber, row: Int, total: Int): P
 
 private fun checkIfNeighborSymbol(row: Int, col: Int, currentNumber: PartNumber): PartNumber {
     var currentNumber1 = currentNumber
-    if (
-            checkIfIsSymbole(row - 1, col - 1) ||
-            checkIfIsSymbole(row - 1, col) ||
-            checkIfIsSymbole(row - 1, col + 1) ||
-            checkIfIsSymbole(row, col - 1) ||
-            checkIfIsSymbole(row, col + 1) ||
-            checkIfIsSymbole(row + 1, col - 1) ||
-            checkIfIsSymbole(row + 1, col) ||
-            checkIfIsSymbole(row + 1, col + 1)
-
-
-    ) {
-        currentNumber1 = currentNumber1.copy(isAdjacent = true)
+    for (i in row - 1..row + 1) {
+        for (j in col - 1..col + 1) {
+            if (checkIfIsSymboleAndGetIt(i, j).first) {
+                currentNumber1 = currentNumber.copy(isAdjacent = true, symbole = checkIfIsSymboleAndGetIt(i, j).second)
+                if (checkIfIsSymboleAndGetIt(i, j).second != null) {
+                    symboles.add(checkIfIsSymboleAndGetIt(i, j).second!!)
+                }
+                break
+            }
+        }
     }
     return currentNumber1
 }
 
-private fun checkIfIsSymbole(row: Int, col: Int): Boolean {
-    return day3Data.getOrNull(row)?.getOrNull(col) != null &&
+private fun checkIfIsSymboleAndGetIt(row: Int, col: Int): Pair<Boolean, Symbole?> {
+    val isSymbole = day3Data.getOrNull(row)?.getOrNull(col) != null &&
             !day3Data.getOrNull(row)!!.getOrNull(col)!!.isDigit() &&
             day3Data.getOrNull(row)!!.getOrNull(col)!!.toString() != "."
+    if (isSymbole) {
+        if (day3Data[row][col].toString() == "*")
+            return Pair(true, Symbole(row = row, col = col))
+        else
+            return Pair(true, null)
+    }
+    return Pair(false, null)
 }
 
-data class PartNumber(
-        val value: String = "",
-        val row: Int = -1,
-        val startIndex: Int = -1,
-        val endIndex: Int = -1,
-        val isAdjacent: Boolean = false,
+data class PartNumber(val value: String = "", val row: Int = -1, val startIndex: Int = -1, val endIndex: Int = -1,
+                      val isAdjacent: Boolean = false,
+                      val symbole: Symbole? = null
 )
+
+data class Symbole(val value: String = "*", val col: Int, val row: Int)
