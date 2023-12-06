@@ -1,26 +1,31 @@
 package src
 
-import java.util.Collections.max
 import java.util.Collections.min
 
 private val day3Data = readFileAsLinesUsingBufferedReader("src/Day05.txt")
 fun main() {
-    val seeds = day3Data.first().split(":").last().trim().split(" ")
+    part2()
+}
+
+private fun part2() {
+    val seeds = day3Data.first().split(":").last().trim().split(" ").chunked(2)
+        .map { SeedNumber(it.first().toLong(), it.last().toLong()) }
+    println(seeds)
     var currentMap = ""
-    val seedToSoilMap = mutableMapOf<Long, Long>()
     val seedToSoilConstat = "seed-to-soil map:"
-    val soilToFertilizerMap = mutableMapOf<Long, Long>()
+    val seedToSoilItemData = mutableListOf<ItemData>()
     val soilToFertilizerConstat = "soil-to-fertilizer map:"
-    val fertilizerToWaterMap = mutableMapOf<Long, Long>()
+    val soilToFertilizerItemData = mutableListOf<ItemData>()
     val fertilizerToWaterConstat = "fertilizer-to-water map:"
-    val waterToLightMap = mutableMapOf<Long, Long>()
+    val fertilizerToWaterItemData = mutableListOf<ItemData>()
     val waterToLightConstat = "water-to-light map:"
-    val lightToTemperatureMap = mutableMapOf<Long, Long>()
+    val waterToLightItemData = mutableListOf<ItemData>()
     val lightToTemperatureConstat = "light-to-temperature map:"
-    val temperatureToHumidityMap = mutableMapOf<Long, Long>()
+    val lightToTemperatureItemData = mutableListOf<ItemData>()
     val temperatureToHumidityConstat = "temperature-to-humidity map:"
-    val humidityToLocationMap = mutableMapOf<Long, Long>()
+    val temperatureToHumidityItemData = mutableListOf<ItemData>()
     val humidityToLocationConstat = "humidity-to-location map:"
+    val humidityToLocationItemData = mutableListOf<ItemData>()
     day3Data.forEach { line ->
         if (line.isBlank()) {
             currentMap = ""
@@ -28,119 +33,281 @@ fun main() {
         if (line.contains(seedToSoilConstat) || currentMap == seedToSoilConstat) {
             currentMap = seedToSoilConstat
             if (line != currentMap) {
-                val linesElements = line.split(" ").map { it.toLong() }
-                for (i in 0..<linesElements.last())
-                    seedToSoilMap[linesElements[1] + i] = linesElements.first() + i
-
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                seedToSoilItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
             }
         }
         if (line.contains(soilToFertilizerConstat) || currentMap == soilToFertilizerConstat) {
             currentMap = soilToFertilizerConstat
             if (line != currentMap) {
                 val linesElements = line.trim().split(" ").map { it.toLong() }
-                for (i in 0..<linesElements.last())
-                    soilToFertilizerMap[linesElements[1] + i] = linesElements.first() + i
+                soilToFertilizerItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
             }
         }
         if (line.contains(fertilizerToWaterConstat) || currentMap == fertilizerToWaterConstat) {
             currentMap = fertilizerToWaterConstat
             if (line != currentMap) {
                 val linesElements = line.trim().split(" ").map { it.toLong() }
-                for (i in 0..<linesElements.last())
-                    fertilizerToWaterMap[linesElements[1] + i] = linesElements.first() + i
+                fertilizerToWaterItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
             }
         }
         if (line.contains(waterToLightConstat) || currentMap == waterToLightConstat) {
             currentMap = waterToLightConstat
             if (line != currentMap) {
                 val linesElements = line.trim().split(" ").map { it.toLong() }
-                for (i in 0..<linesElements.last())
-                    waterToLightMap[linesElements[1] + i] = linesElements.first() + i
+                waterToLightItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
             }
         }
         if (line.contains(lightToTemperatureConstat) || currentMap == lightToTemperatureConstat) {
             currentMap = lightToTemperatureConstat
             if (line != currentMap) {
                 val linesElements = line.trim().split(" ").map { it.toLong() }
-                for (i in 0..<linesElements.last())
-                    lightToTemperatureMap[linesElements[1] + i] = linesElements.first() + i
+                lightToTemperatureItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
             }
         }
         if (line.contains(temperatureToHumidityConstat) || currentMap == temperatureToHumidityConstat) {
             currentMap = temperatureToHumidityConstat
             if (line != currentMap) {
                 val linesElements = line.trim().split(" ").map { it.toLong() }
-                for (i in 0..<linesElements.last())
-                    temperatureToHumidityMap[linesElements[1] + i] = linesElements.first() + i
+                temperatureToHumidityItemData.add(
+                    ItemData(
+                        linesElements[1],
+                        linesElements.first(),
+                        linesElements.last()
+                    )
+                )
             }
         }
         if (line.contains(humidityToLocationConstat) || currentMap == humidityToLocationConstat) {
             currentMap = humidityToLocationConstat
             if (line != currentMap) {
                 val linesElements = line.trim().split(" ").map { it.toLong() }
-                for (i in 0..<linesElements.last())
-                    humidityToLocationMap[linesElements[1] + i] = linesElements.first() + i
+                humidityToLocationItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
             }
         }
 
-        println(line)
     }
 
-    val maxValuesOfSeedToSoil = max(seedToSoilMap.keys + seedToSoilMap.values)
-    for (i in 0..maxValuesOfSeedToSoil) {
-        if (seedToSoilMap.getOrDefault(i, -1L) == -1L) {
-            seedToSoilMap[i] = i
-        }
-    }
-    val maxValuesOfSoilToFertilizer = max(soilToFertilizerMap.keys + soilToFertilizerMap.values)
-    for (i in 0..maxValuesOfSoilToFertilizer) {
-        if (soilToFertilizerMap.getOrDefault(i, -1L) == -1L) {
-            soilToFertilizerMap[i] = i
-        }
-    }
-    val maxValuesOfFertilizerToWater = max(fertilizerToWaterMap.keys + fertilizerToWaterMap.values)
-    for (i in 0..maxValuesOfFertilizerToWater) {
-        if (fertilizerToWaterMap.getOrDefault(i, -1L) == -1L) {
-            fertilizerToWaterMap[i] = i
-        }
-    }
-    val maxValuesOfWaterToLight = max(waterToLightMap.keys + waterToLightMap.values)
-    for (i in 0..maxValuesOfWaterToLight) {
-        if (waterToLightMap.getOrDefault(i, -1L) == -1L) {
-            waterToLightMap[i] = i
-        }
-    }
-    val maxValuesOfLightToTemperature = max(lightToTemperatureMap.keys + lightToTemperatureMap.values)
-    for (i in 0..maxValuesOfLightToTemperature) {
-        if (lightToTemperatureMap.getOrDefault(i, -1L) == -1L) {
-            lightToTemperatureMap[i] = i
-        }
-    }
-    val maxValuesOfTemperatureToHumidity = max(temperatureToHumidityMap.keys + temperatureToHumidityMap.values)
-    for (i in 0..maxValuesOfTemperatureToHumidity) {
-        if (temperatureToHumidityMap.getOrDefault(i, -1L) == -1L) {
-            temperatureToHumidityMap[i] = i
-        }
-    }
-    val maxValuesOfHumidityToLocation = max(humidityToLocationMap.keys + humidityToLocationMap.values)
-    for (i in 0..maxValuesOfHumidityToLocation) {
-        if (humidityToLocationMap.getOrDefault(i, -1L) == -1L) {
-            humidityToLocationMap[i] = i
-        }
-    }
     val locations = mutableListOf<Long>()
-    seeds.forEach {
-        val soil = seedToSoilMap.getOrDefault(it.toLong(), it.toLong())
-        val fertilizer = soilToFertilizerMap.getOrDefault(soil, soil)
-        val water = fertilizerToWaterMap.getOrDefault(fertilizer, fertilizer)
-        val light = waterToLightMap.getOrDefault(water, water)
-        val temperature = lightToTemperatureMap.getOrDefault(light, light)
-        val humidity = temperatureToHumidityMap.getOrDefault(temperature, temperature)
-        val location = humidityToLocationMap.getOrDefault(humidity, humidity)
-        locations.add(location)
+    var minLocation = Long.MAX_VALUE
+    var currentValue: Long
+    seeds.forEach { seed ->
+        for (it in seed.start..(seed.start + seed.length)) {
+            currentValue = it.toLong()
+            // This(run lit@) just allow us to break the loop when we find the value
+            run lit@{
+                seedToSoilItemData.forEach { itemData ->
+                    if (it.toLong() in (itemData.from..(itemData.from + itemData.size))) {
+                        currentValue = it.toLong() + (itemData.to - itemData.from)
+                        return@lit
+                    }
+                }
+            }
+            //we have the same logic for run lit@ above
+            run lit@{
+                soilToFertilizerItemData.forEach { itemData ->
+                    if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                        currentValue += (itemData.to - itemData.from)
+                        return@lit
+                    }
+                }
+            }
+            run lit@{
+                fertilizerToWaterItemData.forEach { itemData ->
+                    if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                        currentValue += (itemData.to - itemData.from)
+                        return@lit
+                    }
+                }
+            }
+            run lit@{
+                waterToLightItemData.forEach { itemData ->
+                    if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                        currentValue += (itemData.to - itemData.from)
+                        return@lit
+                    }
+                }
+            }
+            run lit@{
+                lightToTemperatureItemData.forEach { itemData ->
+                    if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                        currentValue += (itemData.to - itemData.from)
+                        return@lit
+                    }
+                }
+            }
+            run lit@{
+                temperatureToHumidityItemData.forEach { itemData ->
+                    if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                        currentValue += (itemData.to - itemData.from)
+                        return@lit
+                    }
+                }
+            }
+            run lit@{
+                humidityToLocationItemData.forEach { itemData ->
+                    if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                        currentValue += (itemData.to - itemData.from)
+                        return@lit
+                    }
+                }
+            }
+            locations.add(currentValue)
+            if (currentValue < minLocation) {
+                minLocation = currentValue
+            }
+        }
     }
-    println("result")
     println(locations)
     println(min(locations))
-
 }
+
+/*private fun part1() {
+    val seeds = day3Data.first().split(":").last().trim().split(" ")
+    var currentMap = ""
+    val seedToSoilConstat = "seed-to-soil map:"
+    val seedToSoilItemData = mutableListOf<ItemData>()
+    val soilToFertilizerConstat = "soil-to-fertilizer map:"
+    val soilToFertilizerItemData = mutableListOf<ItemData>()
+    val fertilizerToWaterConstat = "fertilizer-to-water map:"
+    val fertilizerToWaterItemData = mutableListOf<ItemData>()
+    val waterToLightConstat = "water-to-light map:"
+    val waterToLightItemData = mutableListOf<ItemData>()
+    val lightToTemperatureConstat = "light-to-temperature map:"
+    val lightToTemperatureItemData = mutableListOf<ItemData>()
+    val temperatureToHumidityConstat = "temperature-to-humidity map:"
+    val temperatureToHumidityItemData = mutableListOf<ItemData>()
+    val humidityToLocationConstat = "humidity-to-location map:"
+    val humidityToLocationItemData = mutableListOf<ItemData>()
+    day3Data.forEach { line ->
+        if (line.isBlank()) {
+            currentMap = ""
+        }
+        if (line.contains(seedToSoilConstat) || currentMap == seedToSoilConstat) {
+            currentMap = seedToSoilConstat
+            if (line != currentMap) {
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                seedToSoilItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
+            }
+        }
+        if (line.contains(soilToFertilizerConstat) || currentMap == soilToFertilizerConstat) {
+            currentMap = soilToFertilizerConstat
+            if (line != currentMap) {
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                soilToFertilizerItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
+            }
+        }
+        if (line.contains(fertilizerToWaterConstat) || currentMap == fertilizerToWaterConstat) {
+            currentMap = fertilizerToWaterConstat
+            if (line != currentMap) {
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                fertilizerToWaterItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
+            }
+        }
+        if (line.contains(waterToLightConstat) || currentMap == waterToLightConstat) {
+            currentMap = waterToLightConstat
+            if (line != currentMap) {
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                waterToLightItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
+            }
+        }
+        if (line.contains(lightToTemperatureConstat) || currentMap == lightToTemperatureConstat) {
+            currentMap = lightToTemperatureConstat
+            if (line != currentMap) {
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                lightToTemperatureItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
+            }
+        }
+        if (line.contains(temperatureToHumidityConstat) || currentMap == temperatureToHumidityConstat) {
+            currentMap = temperatureToHumidityConstat
+            if (line != currentMap) {
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                temperatureToHumidityItemData.add(
+                    ItemData(
+                        linesElements[1],
+                        linesElements.first(),
+                        linesElements.last()
+                    )
+                )
+            }
+        }
+        if (line.contains(humidityToLocationConstat) || currentMap == humidityToLocationConstat) {
+            currentMap = humidityToLocationConstat
+            if (line != currentMap) {
+                val linesElements = line.trim().split(" ").map { it.toLong() }
+                humidityToLocationItemData.add(ItemData(linesElements[1], linesElements.first(), linesElements.last()))
+            }
+        }
+
+    }
+
+    val locations = mutableListOf<Long>()
+    var currentValue: Long
+    seeds.forEach {
+        currentValue = it.toLong()
+        // This(run lit@) just allow us to break the loop when we find the value
+        run lit@{
+            seedToSoilItemData.forEach { itemData ->
+                if (it.toLong() in (itemData.from..(itemData.from + itemData.size))) {
+                    currentValue = it.toLong() + (itemData.to - itemData.from)
+                    return@lit
+                }
+            }
+        }
+        //we have the same logic for run lit@ above
+        run lit@{
+            soilToFertilizerItemData.forEach { itemData ->
+                if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                    currentValue += (itemData.to - itemData.from)
+                    return@lit
+                }
+            }
+        }
+        run lit@{
+            fertilizerToWaterItemData.forEach { itemData ->
+                if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                    currentValue += (itemData.to - itemData.from)
+                    return@lit
+                }
+            }
+        }
+        run lit@{
+            waterToLightItemData.forEach { itemData ->
+                if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                    currentValue += (itemData.to - itemData.from)
+                    return@lit
+                }
+            }
+        }
+        run lit@{
+            lightToTemperatureItemData.forEach { itemData ->
+                if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                    currentValue += (itemData.to - itemData.from)
+                    return@lit
+                }
+            }
+        }
+        run lit@{
+            temperatureToHumidityItemData.forEach { itemData ->
+                if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                    currentValue += (itemData.to - itemData.from)
+                    return@lit
+                }
+            }
+        }
+        run lit@{
+            humidityToLocationItemData.forEach { itemData ->
+                if (currentValue in (itemData.from..(itemData.from + itemData.size))) {
+                    currentValue += (itemData.to - itemData.from)
+                    return@lit
+                }
+            }
+        }
+        locations.add(currentValue)
+    }
+    println(locations)
+    println(min(locations))
+}*/
+
+data class ItemData(val from: Long = -1, val to: Long = -1, val size: Long = -1)
+data class SeedNumber(val start: Long = -1, val length: Long = -1)
