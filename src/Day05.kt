@@ -10,7 +10,6 @@ fun main() {
 private fun part2() {
     val seeds = day3Data.first().split(":").last().trim().split(" ").chunked(2)
         .map { SeedNumber(it.first().toLong(), it.last().toLong()) }
-    println(seeds)
     var currentMap = ""
     val seedToSoilConstat = "seed-to-soil map:"
     val seedToSoilItemData = mutableListOf<ItemData>()
@@ -152,14 +151,14 @@ private fun part2() {
                     }
                 }
             }
-            locations.add(currentValue)
+            //   locations.add(currentValue)
             if (currentValue < minLocation) {
                 minLocation = currentValue
             }
         }
     }
-    println(locations)
-    println(min(locations))
+    println(minLocation)
+    //println(min(locations))
 }
 
 /*private fun part1() {
