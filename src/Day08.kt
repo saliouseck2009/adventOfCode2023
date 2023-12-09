@@ -5,8 +5,43 @@ private const val RESULT = "ZZZ"
 private const val LEFT = 'L'
 private const val RIGHT = 'R'
 private const val START = "AAA"
+private const val CHARACTER_START = 'A'
+private const val CHARACTER_END = 'Z'
 fun main() {
-    part1()
+    //part1()
+    part2()
+}
+
+private fun part2() {
+    val pattern = day3Data.first()
+    val gamesData = day3Data.drop(2)
+    val nodes = extractAllNode(gamesData)
+    var isFound = true
+    var currentKeys = nodes.keys.filter { it.last() == CHARACTER_START }
+    println(currentKeys)
+    var counter = 0L
+    while (isFound) {
+        pattern.forEach { currChar ->
+            counter++
+            currentKeys = currentKeys.map {
+                nodes[it]?.get(currChar)!!
+            }
+            if (checkIfAllLastCharacterIsZ(currentKeys)) {
+                isFound = false
+            }
+        }
+        println(counter)
+    }
+    println(counter)
+}
+
+private fun checkIfAllLastCharacterIsZ(keys: List<String>): Boolean {
+    keys.forEach {
+        if (it.last() != CHARACTER_END) {
+            return false
+        }
+    }
+    return true
 }
 
 private fun part1() {
